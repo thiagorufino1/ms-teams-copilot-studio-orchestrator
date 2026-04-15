@@ -4,8 +4,6 @@ env/.env.*.user
 env/.env.local
 env/.env.playground
 .env
-*.local.yml
-*.playground.yml
 appPackage/build/
 state.json
 devTools/.playground.installInfo.json
