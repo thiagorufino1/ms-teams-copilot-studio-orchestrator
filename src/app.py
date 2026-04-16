@@ -1,3 +1,4 @@
+import logging
 import os
 from microsoft_agents.hosting.core import AgentApplication, AgentAuthConfiguration
 from microsoft_agents.hosting.aiohttp import (
@@ -6,6 +7,16 @@ from microsoft_agents.hosting.aiohttp import (
     CloudAdapter,
 )
 from aiohttp.web import Request, Response, Application, run_app
+
+# ── Logging Configuration ─────────────────────────────────────────────────────
+
+DEBUG_MODE = os.environ.get("DEBUG_MODE", "false").lower() == "true"
+logging.basicConfig(
+    level=logging.DEBUG if DEBUG_MODE else logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    handlers=[logging.StreamHandler()],
+)
+logger = logging.getLogger("app")
 
 from agent import agent_app, connection_manager
 

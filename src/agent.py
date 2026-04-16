@@ -1,3 +1,4 @@
+import logging
 import json
 import os
 import sys
@@ -27,6 +28,8 @@ from core.session_store import CopilotConversationState
 
 load_dotenv()
 apply_sdk_workarounds()
+
+logger = logging.getLogger("agent")
 
 # ── Configuration ─────────────────────────────────────────────────────────────
 
@@ -171,17 +174,15 @@ async def _run_supervisor(
                 else:
                     args = json.loads(tool_call.function.arguments)
                     question = args.get("question", "")
-                    print(
-                        f"[tool] {tool_name} → {agent_key}: {question[:80]!r}",
-                        flush=True,
+                    logger.info(
+                        "[tool] %s → %s: %s", tool_name, agent_key, question[:80].replace("\n", " ")
                     )
                     tool_result = await _call_agent(
                         agent_key, question, teams_conv_id, copilot_states,
                         streaming_response=streaming_response,
                     )
-                    print(
-                        f"[tool] {agent_key} responded ({len(tool_result)} chars)",
-                        flush=True,
+                    logger.debug(
+                        "[tool] %s responded (%d chars)", agent_key, len(tool_result)
                     )
 
                 messages.append({
@@ -229,14 +230,11 @@ async def on_message(context: TurnContext, state: TurnState):
     if len(history) > config.max_history_turns:
         history = history[-config.max_history_turns:]
 
-    print(
-        "[turn] start",
-        json.dumps({
-            "history_turns": len(history),
-            "registered_agents": list(agent_registry.keys()),
-            "teams_conv_id": teams_conv_id,
-        }),
-        flush=True,
+    logger.info(
+        "[turn] start (history_turns=%d, registered_agents=%s, teams_conv_id=%s)",
+        len(history),
+        list(agent_registry.keys()),
+        teams_conv_id,
     )
 
     response.set_feedback_loop(config.ai_feedback_loop_enabled)
@@ -262,7 +260,7 @@ async def on_message(context: TurnContext, state: TurnState):
         response.queue_text_chunk(final_text)
     finally:
         await response.end_stream()
-        print(f"[turn] end_stream completed ({len(final_text)} chars)", flush=True)
+        logger.info("[turn] end_stream completed (%d chars)", len(final_text))
 
     if final_text:
         history.append({"role": "assistant", "content": final_text})
@@ -272,6 +270,5 @@ async def on_message(context: TurnContext, state: TurnState):
 
 @agent_app.error
 async def on_error(context: TurnContext, error: Exception):
-    print(f"\n [on_turn_error] unhandled error: {error}", file=sys.stderr)
-    traceback.print_exc()
+    logger.exception("[on_turn_error] unhandled error: %s", error)
     await context.send_activity("The agent encountered an error or bug.")

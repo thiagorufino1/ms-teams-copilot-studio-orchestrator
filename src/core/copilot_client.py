@@ -150,7 +150,7 @@ class CopilotClient:
         if response.status_code in (200, 201, 202):
             return True
         logger.error(
-            "Direct Line send failed for %s: %s %s",
+            "Direct Line send failed for %s: %s - %s",
             self.agent_config.key,
             response.status_code,
             response.text,
