@@ -1,6 +1,7 @@
 python-dotenv
-microsoft-agents-hosting-aiohttp
-microsoft-agents-authentication-msal
-openai
+microsoft-agents-hosting-aiohttp==0.8.0
+microsoft-agents-authentication-msal==0.8.0
+microsoft-agents-hosting-core==0.8.0
+openai>=1.52.0,<2.0.0
 httpx
 tenacity
