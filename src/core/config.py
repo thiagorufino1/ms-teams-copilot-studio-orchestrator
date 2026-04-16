@@ -71,7 +71,11 @@ class DirectLineRuntimeConfig:
 def _required_env(name: str) -> str:
     value = os.environ.get(name)
     if not value:
-        raise ValueError(f"Missing required environment variable: {name}")
+        raise ValueError(
+            f"\n[ERRO DE CONFIGURAÇÃO] Variável obrigatória '{name}' não encontrada.\n"
+            "Isso geralmente acontece quando a variável está no arquivo '.user.example' "
+            "mas não foi adicionada no arquivo 'm365agents.local.yml' (seção deploy).\n"
+        )
     return value
 
 
@@ -105,8 +109,9 @@ def _build_agent_from_prefix(agent_id: str) -> CopilotAgentConfig:
     )
     if not secret:
         raise ValueError(
-            f"Direct Line secret for agent '{agent_id}' not found. "
-            f"Set {prefix}DIRECT_LINE_SECRET or DIRECT_LINE_SECRET_{upper}."
+            f"\n[ERRO DE CONFIGURAÇÃO] O secret do Direct Line para o agente '{agent_id}' não foi encontrado.\n"
+            f"Adicione {prefix}DIRECT_LINE_SECRET no seu arquivo 'env/.env.local.user' "
+            "E também na seção 'deploy' do seu arquivo 'm365agents.local.yml'.\n"
         )
 
     return CopilotAgentConfig(
