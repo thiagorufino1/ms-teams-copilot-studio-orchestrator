@@ -63,6 +63,7 @@ class DirectLineRuntimeConfig:
     timeout_sec: int
     poll_interval_sec: float
     debug_mode: bool
+    ssl_verify: bool
     structured_logging: bool
 
 
@@ -172,5 +173,6 @@ def build_direct_line_runtime_config() -> DirectLineRuntimeConfig:
             "DIRECT_LINE_POLL_INTERVAL_SEC", DEFAULT_DIRECT_LINE_POLL_INTERVAL_SEC
         ),
         debug_mode=_env_bool("DEBUG_MODE", False),
+        ssl_verify=_env_bool("SSL_VERIFY", True),
         structured_logging=_env_bool("STRUCTURED_LOGGING", False),
     )

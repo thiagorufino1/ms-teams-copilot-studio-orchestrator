@@ -95,6 +95,7 @@ class CopilotClient:
         self._owns_http_client = http_client is None
         self._http = http_client or httpx.AsyncClient(
             timeout=_HTTP_TIMEOUT,
+            verify=self.runtime_config.ssl_verify,
             limits=httpx.Limits(max_keepalive_connections=5, max_connections=10),
         )
 
